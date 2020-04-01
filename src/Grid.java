@@ -27,7 +27,7 @@ class Grid {
     private static Stack<StackObject> undo = new Stack<>();
     private static Stack<StackObject> redo = new Stack<>();
 
-    private static ArrayList<Box> getAllBoxes(){
+    static ArrayList<Box> getAllBoxes(){
         return allBoxes;
     }
 
@@ -76,7 +76,6 @@ class Grid {
 
         selectedBox = getBox(gameAreaPane, 1, n);
 
-
         return gameAreaPane;
     }
 
@@ -115,6 +114,14 @@ class Grid {
         }
 
         /**
+         * Set the main text for a given box
+         * @param mainText text to set variable to
+         */
+        void setMainText(String mainText) {
+            this.mainText.setText(mainText);
+        }
+
+        /**
          * Get ID of box
          *
          * @return ID
@@ -140,11 +147,11 @@ class Grid {
         }
 
         /**
-         * Set the main text of a box in the grid
+         * Set the main text of the currently selected box
          *
          * @param text to put in the box
          */
-        static void setMainText(String text) {
+        static void setSelectedBoxMainText(String text) {
 
             if (CheckTextValid(text)) {
                 selectedBox.mainText.setText(text);
@@ -199,7 +206,6 @@ class Grid {
                 box.setStyle("-fx-background-color: Transparent");
                 TopUI.SetRedo(true);
                 TopUI.SetUndo(true);
-
 
             }
         }
@@ -517,7 +523,6 @@ class Grid {
             });
             t.setRepeats(true);
             t.start();
-
 
         }
 

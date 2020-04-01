@@ -14,7 +14,9 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Optional;
+import java.util.Random;
 
 class TopUI extends Node {
 
@@ -45,6 +47,7 @@ class TopUI extends Node {
         Button loadFromFile = new Button("load From File");
         Button loadFromText = new Button("load From Text");
         final CheckBox[] showErrorsCheckbox = {new CheckBox("Show errors")};
+        Button randomGame = new Button("Generate random game");
 
         HBox fontSizePane = new HBox();
         fontSizePane.setSpacing(5);
@@ -60,6 +63,7 @@ class TopUI extends Node {
 
         undo.setOnAction(e -> Grid.Box.PopUndo());
         redo.setOnAction(e -> Grid.Box.PopRedo());
+        randomGame.setOnAction(e -> GenerateRandomGrid());
 
         undo.setPrefWidth(100);
         redo.setPrefWidth(100);
@@ -67,7 +71,7 @@ class TopUI extends Node {
         loadFromFile.setPrefWidth(100);
         loadFromText.setPrefWidth(100);
 
-        UIPane.getChildren().addAll(undo, redo, clear, loadFromFile, loadFromText, showErrorsCheckbox[0], fontSizePane);
+        UIPane.getChildren().addAll(undo, redo, clear, loadFromFile, loadFromText, showErrorsCheckbox[0], fontSizePane, randomGame);
 
         fontSize.getSelectionModel().selectedIndexProperty().addListener((observableValue, number, number2) ->
                 Grid.Box.updateFontSizes(fontSize.getItems().get((Integer) number2)));
@@ -367,6 +371,87 @@ class TopUI extends Node {
     static void SetRedo(Boolean value) {
 
         redo.setDisable(value);
+
+    }
+
+    private static void GenerateRandomGrid(){
+
+        Random random = new Random();
+        int N = Mathdoku.getN();
+
+        Mathdoku.Main.NewGrid(N*N);
+
+        int[][] grid = new int[N+1][N+1];
+        ArrayList<Grid.Box> Boxes = Grid.getAllBoxes();
+
+        for(Grid.Box box: Boxes){
+
+            int X = (box.getID() -1) / N;
+            int Y = (box.getID() - 1) % N;
+
+            int value = ((X + Y) % N) + 1;
+
+            box.setMainText(String.valueOf(value));
+            grid[X][Y] = value;
+
+        }
+
+        for (int[] i:grid) {
+            System.out.println(Arrays.toString(i));
+        }
+
+        // Shuffle rows a random amount of times
+        int numOfShuffles = random.nextInt(5) + 5;
+
+        for (int i = 0; i < numOfShuffles; i++) {
+
+            int row1 = random.nextInt(N);
+            int row2 = random.nextInt(N);
+
+            while(row1 == row2){
+                row2 = random.nextInt(N);
+            }
+
+            System.arraycopy(grid[row1], 0, grid[N], 0, grid.length);
+            System.arraycopy(grid[row2], 0, grid[row1], 0, grid.length);
+            System.arraycopy(grid[N], 0, grid[row2], 0, grid.length);
+
+        }
+
+        // Shuffle columns
+        numOfShuffles = random.nextInt(5) + 5;
+
+        for (int i = 0; i < numOfShuffles; i++) {
+
+            int col1 = random.nextInt(N);
+            int col2 = random.nextInt(N);
+
+            while(col1 == col2){
+                col2 = random.nextInt(N);
+            }
+
+            for (int j=0; j < grid.length;j++){
+
+                grid[j][N] = grid[j][col1];
+                grid[j][col1] = grid[j][col2];
+                grid[j][col2] = grid[j][N];
+
+            }
+
+        }
+
+        // Make the array look nice for testing <----------------------------------------------------- delete this later
+        for (int j=0; j < grid.length;j++){
+
+            grid[j][N] = 0;
+            grid[N][j] = 0;
+
+        }
+
+        System.out.println();
+        for (int[] i:grid) {
+            System.out.println(Arrays.toString(i));
+        }
 
     }
 

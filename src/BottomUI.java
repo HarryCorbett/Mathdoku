@@ -30,7 +30,7 @@ class BottomUI extends Node {
             UIPane.getChildren().add(button);
 
             button.setOnMouseClicked(e -> {
-                Grid.Box.setMainText(button.getText());
+                Grid.Box.setSelectedBoxMainText(button.getText());
                 Grid.Box.CheckForErrors();
             });
         }
@@ -38,7 +38,7 @@ class BottomUI extends Node {
         Button delete = new Button("del");
         Text text = new Text();
 
-        delete.setOnMouseClicked(e -> Grid.Box.setMainText(""));
+        delete.setOnMouseClicked(e -> Grid.Box.setSelectedBoxMainText(""));
 
         UIPane.getChildren().addAll(delete,text);
 

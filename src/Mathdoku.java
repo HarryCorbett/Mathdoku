@@ -1,14 +1,8 @@
 import javafx.application.Application;
-import javafx.geometry.Rectangle2D;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.Alert;
-import javafx.scene.control.ButtonType;
 import javafx.scene.layout.*;
-import javafx.stage.Screen;
 import javafx.stage.Stage;
-
-import java.util.Optional;
 
 public class Mathdoku {
 
@@ -61,7 +55,7 @@ public class Mathdoku {
             scene.setOnKeyPressed(e -> {
 
                 Grid.Box.PushUndo();
-                Grid.Box.setMainText(e.getText());
+                Grid.Box.setSelectedBoxMainText(e.getText());
 
                 if (!(Grid.Box.CheckForErrors()) && Grid.Box.CheckAllBoxesFilled()) {
 
@@ -87,7 +81,6 @@ public class Mathdoku {
             gui.setCenter((newGrid.createGrid()));
             BottomUI bottomUI = new BottomUI();
             gui.setBottom(bottomUI.createBottomUI());
-
         }
 
     }
