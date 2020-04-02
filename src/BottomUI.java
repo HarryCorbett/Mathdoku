@@ -45,5 +45,4 @@ class BottomUI extends Node {
         return UIPane;
     }
 
-
 }

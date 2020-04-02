@@ -74,8 +74,12 @@ class Grid {
             }
         }
 
-        selectedBox = getBox(gameAreaPane, 1, n);
+        selectedBox = getBox(1);
 
+        return gameAreaPane;
+    }
+
+    private static GridPane getGameAreaPane() {
         return gameAreaPane;
     }
 
@@ -546,7 +550,7 @@ class Grid {
          */
         Cage(String operator, int result, ArrayList<Integer> boxIDs) {
 
-            boxIDs.forEach(box -> boxes.add(Grid.getBox(gameAreaPane, box, Mathdoku.getN())));
+            boxIDs.forEach(box -> boxes.add(Grid.getBox(box)));
             allCages.add(this);
             this.operator = operator;
             this.result = result;
@@ -570,17 +574,17 @@ class Grid {
     /**
      * get the box object that is in a given ID value of the grid
      *
-     * @param gridPane the grid to find the box in
-     * @param ID       of the grid square containing the box
-     * @param n        amount of rows/columns
+     * @param ID of the grid square containing the box
      * @return box object in the given grid square
      */
-    private static Box getBox(GridPane gridPane, int ID, int n) {
+    static Box getBox(int ID) {
+
+        int n = Mathdoku.getN();
 
         int X = ID / n;
         int Y = ID % n;
 
-        return (Box) gridPane.getChildren().get(Y + n * X);
+        return (Box) getGameAreaPane().getChildren().get(Y + n * X);
 
     }
 

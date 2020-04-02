@@ -171,7 +171,7 @@ class TopUI extends Node {
                         e.printStackTrace();
                     }
 
-                }else {
+                } else {
 
                     displayFileError();
 
@@ -374,33 +374,35 @@ class TopUI extends Node {
 
     }
 
-    private static void GenerateRandomGrid(){
+    private static void GenerateRandomGrid() {
 
         Random random = new Random();
         int N = Mathdoku.getN();
 
-        Mathdoku.Main.NewGrid(N*N);
+        // Create a new grid
+        Mathdoku.Main.NewGrid(N * N);
 
-        int[][] grid = new int[N+1][N+1];
+        // create a 2D array to represent the grid to make randomising simpler
+        int[][] grid = new int[N + 1][N + 1];
         ArrayList<Grid.Box> Boxes = Grid.getAllBoxes();
 
-        for(Grid.Box box: Boxes){
+        for (Grid.Box box : Boxes) {
 
-            int X = (box.getID() -1) / N;
+            int X = (box.getID() - 1) / N;
             int Y = (box.getID() - 1) % N;
 
             int value = ((X + Y) % N) + 1;
 
-            box.setMainText(String.valueOf(value));
             grid[X][Y] = value;
 
         }
 
-        for (int[] i:grid) {
+        // Output the grid for testing <----------------------------------------- delete later
+        for (int[] i : grid) {
             System.out.println(Arrays.toString(i));
         }
 
-        // Shuffle rows a random amount of times
+        // Shuffle rows
         int numOfShuffles = random.nextInt(5) + 5;
 
         for (int i = 0; i < numOfShuffles; i++) {
@@ -408,7 +410,7 @@ class TopUI extends Node {
             int row1 = random.nextInt(N);
             int row2 = random.nextInt(N);
 
-            while(row1 == row2){
+            while (row1 == row2) {
                 row2 = random.nextInt(N);
             }
 
@@ -426,11 +428,11 @@ class TopUI extends Node {
             int col1 = random.nextInt(N);
             int col2 = random.nextInt(N);
 
-            while(col1 == col2){
+            while (col1 == col2) {
                 col2 = random.nextInt(N);
             }
 
-            for (int j=0; j < grid.length;j++){
+            for (int j = 0; j < grid.length; j++) {
 
                 grid[j][N] = grid[j][col1];
                 grid[j][col1] = grid[j][col2];
@@ -440,8 +442,111 @@ class TopUI extends Node {
 
         }
 
+        // Set the box values to the shuffled array so cages can be made
+        ArrayList<Grid.Box> boxes = Grid.getAllBoxes();
+
+        for (int i = 0; i < boxes.size(); i++) {
+
+            int X = i / N;
+            int Y = i % N;
+            boxes.get(i).setMainText(String.valueOf(grid[X][Y]));
+
+        }
+
+        // Create cages from randomised boxes
+        ArrayList<Integer> usedBoxes = new ArrayList<>();
+
+        for (Grid.Box box : boxes) {
+
+            if (!(usedBoxes.contains(box.getID()))) {
+
+                String operator = getRandomOperator();
+                ArrayList<Integer> currentCageArray = new ArrayList<>();
+                int cageSize = random.nextInt(4);
+
+                usedBoxes.add(box.getID());
+                currentCageArray.add(box.getID());
+
+                Grid.Box currentBox = box;
+                Grid.Box nextBox = currentBox;
+
+                // select a random amount of adjacent boxes to be in the cage
+                for (int i = 0; i < cageSize; i++) {
+
+                    int escapeCounter = 0;
+
+                    while (nextBox == currentBox) {
+
+                        int num = random.nextInt(4);
+                        System.out.println(num);
+
+                        switch (num) {
+
+                            case 0:
+                                if ((currentBox.getID() + 1) < N * N + 1 && (currentBox.getID() - 1) / N == (currentBox.getID() + 1 - 1) / N && !usedBoxes.contains(currentBox.getID() + 1)) {
+                                    nextBox = Grid.getBox(currentBox.getID() + 1);
+                                    break;
+                                }
+                            case 1:
+                                if ((currentBox.getID() + N) < N * N + 1 && !usedBoxes.contains(currentBox.getID() + N)) {
+                                    nextBox = Grid.getBox(currentBox.getID() + N);
+                                    break;
+                                }
+                            case 2:
+                                if ((currentBox.getID() - 1) > 0 && (currentBox.getID() - 1 - 1) / N == (currentBox.getID() - 1) / N && !usedBoxes.contains(currentBox.getID() - 1)) {
+                                    nextBox = Grid.getBox(currentBox.getID() - 1);
+                                    break;
+                                }
+                            case 3:
+                                if ((currentBox.getID() - N) > 0 && !usedBoxes.contains(currentBox.getID() - N)) {
+                                    nextBox = Grid.getBox(currentBox.getID() - N);
+                                    break;
+                                }
+                        }
+
+                        escapeCounter += 1;
+
+                        // escape the loop if all adjacent boxes are already part of a cage
+                        if(escapeCounter > 10)
+                            break;
+
+                    }
+
+                    // only add to arrays if they dont already contain that box
+                    if(!usedBoxes.contains(nextBox.getID()))
+                        usedBoxes.add(nextBox.getID());
+
+                    if(!currentCageArray.contains(nextBox.getID()))
+                        currentCageArray.add(nextBox.getID());
+
+                    currentBox = nextBox;
+
+                }
+
+                // remove operator for singleton cages
+                if(currentCageArray.size() == 1){
+                    operator = "";
+                }
+
+                // Create the cage
+                if (!currentCageArray.isEmpty()) {
+                    System.out.println(currentCageArray);
+                    new Grid.Cage(operator, 1, currentCageArray);
+                }
+
+                System.out.print("Used boxes:");
+                for (Integer usedBox : usedBoxes) {
+                    System.out.print(usedBox);
+                    System.out.print(",");
+                }
+                System.out.println();
+            }
+
+        }
+
+
         // Make the array look nice for testing <----------------------------------------------------- delete this later
-        for (int j=0; j < grid.length;j++){
+        for (int j = 0; j < grid.length; j++) {
 
             grid[j][N] = 0;
             grid[N][j] = 0;
@@ -449,10 +554,35 @@ class TopUI extends Node {
         }
 
         System.out.println();
-        for (int[] i:grid) {
+        for (int[] i : grid) {
             System.out.println(Arrays.toString(i));
         }
 
+        Grid.Box.clearAllBoxes();
+
     }
 
+    /**
+     * Choose a random operator for the cage
+     *
+     * @return a string containing the operators symbol
+     */
+    private static String getRandomOperator() {
+
+        Random random = new Random();
+
+        switch (random.nextInt(4)) {
+
+            case 0:
+                return "x";
+            case 1:
+                return "÷";
+            case 2:
+                return "+";
+            case 3:
+                return "-";
+
+        }
+        return " ";
+    }
 }
