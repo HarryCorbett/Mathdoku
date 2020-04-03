@@ -13,10 +13,7 @@ import javafx.stage.Stage;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Optional;
-import java.util.Random;
+import java.util.*;
 
 class TopUI extends Node {
 
@@ -397,11 +394,6 @@ class TopUI extends Node {
 
         }
 
-        // Output the grid for testing <----------------------------------------- delete later
-        for (int[] i : grid) {
-            System.out.println(Arrays.toString(i));
-        }
-
         // Shuffle rows
         int numOfShuffles = random.nextInt(5) + 5;
 
@@ -460,7 +452,6 @@ class TopUI extends Node {
 
             if (!(usedBoxes.contains(box.getID()))) {
 
-                String operator = getRandomOperator();
                 ArrayList<Integer> currentCageArray = new ArrayList<>();
                 int cageSize = random.nextInt(4);
 
@@ -478,7 +469,6 @@ class TopUI extends Node {
                     while (nextBox == currentBox) {
 
                         int num = random.nextInt(4);
-                        System.out.println(num);
 
                         switch (num) {
 
@@ -524,28 +514,78 @@ class TopUI extends Node {
                 }
 
                 // remove operator for singleton cages
+                String operator = getRandomOperator(currentCageArray);
+
                 if(currentCageArray.size() == 1){
                     operator = "";
                 }
 
                 // Create the cage
                 if (!currentCageArray.isEmpty()) {
-                    System.out.println(currentCageArray);
-                    new Grid.Cage(operator, 1, currentCageArray);
+
+                    int result = 0;
+
+                    if(currentCageArray.size() == 1){
+                        operator = "";
+                        result = Integer.parseInt(Grid.getBox(currentCageArray.get(0)).getMainText().getText());
+                    }else{
+
+                        switch (operator) {
+
+                            case "x":
+                                result = 1;
+                                for (Integer boxID : currentCageArray) {
+                                    result = result * Integer.parseInt(Grid.getBox(boxID).getMainText().getText());
+                                }
+                                break;
+
+                            case "÷":
+
+                                ArrayList<Double> boxValuesDivision = getBoxValuesFromIDArray(currentCageArray);
+                                double valueDivision = Collections.max(boxValuesDivision);
+                                boxValuesDivision.remove(valueDivision);
+
+                                for(double boxValue: boxValuesDivision){
+                                    valueDivision = valueDivision / boxValue;
+                                }
+                                result = (int) Math.round(valueDivision);
+                                break;
+
+                            case "-":
+
+                                ArrayList<Double> boxValuesSubtraction = getBoxValuesFromIDArray(currentCageArray);
+                                double valueSubtraction = Collections.max(boxValuesSubtraction);
+                                boxValuesSubtraction.remove(valueSubtraction);
+
+                                for(double boxValue: boxValuesSubtraction){
+                                    valueSubtraction = valueSubtraction - boxValue;
+                                }
+                                result = (int) Math.round(valueSubtraction);
+
+
+                                break;
+
+                            case "+":
+                                result = 0;
+                                for (Integer boxID : currentCageArray) {
+                                    result = result + Integer.parseInt(Grid.getBox(boxID).getMainText().getText());
+                                }
+
+                                break;
+                        }
+
+                    }
+
+                    new Grid.Cage(operator, result, currentCageArray);
                 }
 
-                System.out.print("Used boxes:");
-                for (Integer usedBox : usedBoxes) {
-                    System.out.print(usedBox);
-                    System.out.print(",");
-                }
-                System.out.println();
             }
 
         }
 
+        Grid.Box.clearAllBoxes();
 
-        // Make the array look nice for testing <----------------------------------------------------- delete this later
+        // Make the array look nice for testing <---------------------------------- delete this later
         for (int j = 0; j < grid.length; j++) {
 
             grid[j][N] = 0;
@@ -558,7 +598,7 @@ class TopUI extends Node {
             System.out.println(Arrays.toString(i));
         }
 
-        Grid.Box.clearAllBoxes();
+        // --------------------------------------------------------------------------
 
     }
 
@@ -567,22 +607,56 @@ class TopUI extends Node {
      *
      * @return a string containing the operators symbol
      */
-    private static String getRandomOperator() {
+    private static String getRandomOperator(ArrayList<Integer> currentCageArray) {
 
         Random random = new Random();
 
-        switch (random.nextInt(4)) {
+        while(true) {
+            switch (random.nextInt(4)) {
 
-            case 0:
-                return "x";
-            case 1:
-                return "÷";
-            case 2:
-                return "+";
-            case 3:
-                return "-";
+                case 0:
+                    return "x";
+                case 1:
 
+                    ArrayList<Double> boxValuesDivision = getBoxValuesFromIDArray(currentCageArray);
+                    double valueDivision = Collections.max(boxValuesDivision);
+                    boxValuesDivision.remove(valueDivision);
+
+                    for(double boxValue: boxValuesDivision){
+                           valueDivision = valueDivision / boxValue;
+                    }
+                    if (valueDivision == (int)valueDivision){
+                        return "÷";
+                    }
+
+                case 2:
+                    return "+";
+
+                case 3:
+
+                    ArrayList<Double> boxValuesSubtraction = getBoxValuesFromIDArray(currentCageArray);
+                    double valueSubtraction = Collections.max(boxValuesSubtraction);
+                    boxValuesSubtraction.remove(valueSubtraction);
+
+                    for(double boxValue: boxValuesSubtraction){
+                        valueSubtraction = valueSubtraction - boxValue;
+                    }
+                    if (valueSubtraction > 0){
+                        return "-";
+                    }
+            }
         }
-        return " ";
+
     }
+
+    private static ArrayList<Double> getBoxValuesFromIDArray(ArrayList<Integer> list){
+
+        ArrayList<Double> boxValuesToCheck = new ArrayList<>();
+        for (Integer boxID : list) {
+            boxValuesToCheck.add(Double.valueOf(Grid.getBox(boxID).getMainText().getText()));
+        }
+        return boxValuesToCheck;
+
+    }
+
 }
