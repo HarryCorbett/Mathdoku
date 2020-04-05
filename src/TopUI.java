@@ -60,7 +60,6 @@ class TopUI extends Node {
 
         undo.setOnAction(e -> Grid.Box.PopUndo());
         redo.setOnAction(e -> Grid.Box.PopRedo());
-        randomGame.setOnAction(e -> GenerateRandomGrid());
 
         undo.setPrefWidth(100);
         redo.setPrefWidth(100);
@@ -217,6 +216,77 @@ class TopUI extends Node {
 
         });
 
+        randomGame.setOnAction(actionEvent -> {
+
+            Stage randomGameMenu = new Stage();
+            randomGameMenu.initModality(Modality.APPLICATION_MODAL);
+            randomGameMenu.setTitle("Generate Random Game");
+
+            Label sizeLabel = new Label("Grid size:");
+            sizeLabel.setPadding(new Insets(5));
+            Slider sizeSlider = new Slider(2, 8, 5);
+            sizeSlider.setBlockIncrement(1);
+            sizeSlider.setMajorTickUnit(1);
+            sizeSlider.setMinorTickCount(0);
+            sizeSlider.setShowTickLabels(true);
+            sizeSlider.setSnapToTicks(true);
+            sizeSlider.setShowTickMarks(true);
+
+            Label difficultyLabel = new Label("Difficulty:");
+            difficultyLabel.setPadding(new Insets(5));
+            ChoiceBox<String> difficultyChoice = new ChoiceBox<>();
+            difficultyChoice.getItems().addAll("Easy","Medium","Hard");
+            difficultyChoice.setValue("Medium");
+
+            Button cancel = new Button("close");
+            cancel.setOnAction(e -> randomGameMenu.close());
+
+            Button submit = new Button("submit");
+            submit.setOnAction(e -> {
+
+                // difficultyInt represents the maximum cage size for the random grid
+                int difficultyInt = 4;
+
+                switch (difficultyChoice.getValue()){
+
+                    case "Easy":
+                        difficultyInt = 3;
+                        break;
+                    case "Hard":
+                        difficultyInt = 5;
+                        break;
+                }
+
+                GenerateRandomGrid((int) Math.round(sizeSlider.getValue()),difficultyInt);
+                randomGameMenu.close();
+
+            });
+
+            VBox vBox = new VBox(5);
+            vBox.getChildren().addAll(sizeLabel,sizeSlider,difficultyLabel,difficultyChoice);
+            vBox.setPadding(new Insets(5));
+
+            HBox hBox = new HBox(5);
+            hBox.getChildren().addAll(cancel, submit);
+            hBox.setPadding(new Insets(5));
+
+            BorderPane borderPane = new BorderPane();
+            borderPane.setPadding(new Insets(10));
+
+            borderPane.setBottom(hBox);
+            borderPane.setCenter(vBox);
+
+            borderPane.setPrefWidth(300);
+
+            Scene generateRandomGamePopup = new Scene(borderPane);
+            randomGameMenu.setScene(generateRandomGamePopup);
+
+            randomGameMenu.showAndWait();
+
+        });
+
+        GenerateRandomGrid(6,4);
+
         return UIPane;
     }
 
@@ -371,7 +441,9 @@ class TopUI extends Node {
 
     }
 
-    private static void GenerateRandomGrid() {
+    private static void GenerateRandomGrid(int gridSize,int difficulty) {
+
+        Mathdoku.setN(gridSize);
 
         Random random = new Random();
         int N = Mathdoku.getN();
@@ -453,7 +525,7 @@ class TopUI extends Node {
             if (!(usedBoxes.contains(box.getID()))) {
 
                 ArrayList<Integer> currentCageArray = new ArrayList<>();
-                int cageSize = random.nextInt(4);
+                int cageSize = random.nextInt(difficulty);
 
                 usedBoxes.add(box.getID());
                 currentCageArray.add(box.getID());
@@ -461,7 +533,6 @@ class TopUI extends Node {
                 Grid.Box currentBox = box;
                 Grid.Box nextBox = currentBox;
 
-                // select a random amount of adjacent boxes to be in the cage
                 for (int i = 0; i < cageSize; i++) {
 
                     int escapeCounter = 0;

@@ -9,7 +9,7 @@ public class Mathdoku {
     private static int n = 6;
     private static BorderPane gui = new BorderPane();
 
-    private static void setN(int n) {
+    static void setN(int n) {
         Mathdoku.n = n;
     }
 
