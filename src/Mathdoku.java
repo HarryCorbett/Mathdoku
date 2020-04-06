@@ -4,7 +4,11 @@ import javafx.scene.Scene;
 import javafx.scene.layout.*;
 import javafx.stage.Stage;
 
-public class Mathdoku {
+public class Mathdoku{
+
+    public static void main(String[] args) {
+        Main.main(args);
+    }
 
     private static int n = 6;
     private static BorderPane gui = new BorderPane();
@@ -42,7 +46,7 @@ public class Mathdoku {
         }
 
         @Override
-        public void start(Stage stage) {
+        public void start(Stage stage) throws Exception{
 
             primaryStage = stage;
 
