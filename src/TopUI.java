@@ -342,7 +342,7 @@ class TopUI extends Node {
      * Check that each line of an input does not contain any errors, and the entire grid has no errors as a whole
      *
      * @param stringBoxes   IDs of boxes given on the current line
-     * @param usedBoxes     Arraylist of boxes already used to check the same box isnt in multiple cages
+     * @param usedBoxes     Arraylist of boxes already used to check the same box isn't in multiple cages
      * @param errorDetected boolean for if an error was found
      * @return errorDetected
      */
@@ -518,16 +518,16 @@ class TopUI extends Node {
         }
 
         // Create cages from randomised boxes
-        ArrayList<Integer> usedBoxes = new ArrayList<>();
+        ArrayList<Integer> usedBoxesForCage = new ArrayList<>();
 
         for (Grid.Box box : boxes) {
 
-            if (!(usedBoxes.contains(box.getID()))) {
+            if (!(usedBoxesForCage.contains(box.getID()))) {
 
                 ArrayList<Integer> currentCageArray = new ArrayList<>();
                 int cageSize = random.nextInt(difficulty);
 
-                usedBoxes.add(box.getID());
+                usedBoxesForCage.add(box.getID());
                 currentCageArray.add(box.getID());
 
                 Grid.Box currentBox = box;
@@ -544,22 +544,22 @@ class TopUI extends Node {
                         switch (num) {
 
                             case 0:
-                                if ((currentBox.getID() + 1) < N * N + 1 && (currentBox.getID() - 1) / N == (currentBox.getID() + 1 - 1) / N && !usedBoxes.contains(currentBox.getID() + 1)) {
+                                if ((currentBox.getID() + 1) < N * N + 1 && (currentBox.getID() - 1) / N == (currentBox.getID() + 1 - 1) / N && !usedBoxesForCage.contains(currentBox.getID() + 1)) {
                                     nextBox = Grid.getBox(currentBox.getID() + 1);
                                     break;
                                 }
                             case 1:
-                                if ((currentBox.getID() + N) < N * N + 1 && !usedBoxes.contains(currentBox.getID() + N)) {
+                                if ((currentBox.getID() + N) < N * N + 1 && !usedBoxesForCage.contains(currentBox.getID() + N)) {
                                     nextBox = Grid.getBox(currentBox.getID() + N);
                                     break;
                                 }
                             case 2:
-                                if ((currentBox.getID() - 1) > 0 && (currentBox.getID() - 1 - 1) / N == (currentBox.getID() - 1) / N && !usedBoxes.contains(currentBox.getID() - 1)) {
+                                if ((currentBox.getID() - 1) > 0 && (currentBox.getID() - 1 - 1) / N == (currentBox.getID() - 1) / N && !usedBoxesForCage.contains(currentBox.getID() - 1)) {
                                     nextBox = Grid.getBox(currentBox.getID() - 1);
                                     break;
                                 }
                             case 3:
-                                if ((currentBox.getID() - N) > 0 && !usedBoxes.contains(currentBox.getID() - N)) {
+                                if ((currentBox.getID() - N) > 0 && !usedBoxesForCage.contains(currentBox.getID() - N)) {
                                     nextBox = Grid.getBox(currentBox.getID() - N);
                                     break;
                                 }
@@ -574,8 +574,8 @@ class TopUI extends Node {
                     }
 
                     // only add to arrays if they dont already contain that box
-                    if(!usedBoxes.contains(nextBox.getID()))
-                        usedBoxes.add(nextBox.getID());
+                    if(!usedBoxesForCage.contains(nextBox.getID()))
+                        usedBoxesForCage.add(nextBox.getID());
 
                     if(!currentCageArray.contains(nextBox.getID()))
                         currentCageArray.add(nextBox.getID());

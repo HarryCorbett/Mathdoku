@@ -54,19 +54,28 @@ public class Mathdoku{
             stage.setScene(scene);
             stage.setTitle("Mathdoku");
             stage.show();
+            Grid.Box.setFirstSelectedBox();
 
-            // Set the text of the selected box when a keyboard input is entered
+            // Set the text of the selected box when a keyboard input is entered or move the selected box if arrow keys
             scene.setOnKeyPressed(e -> {
 
-                Grid.Box.PushUndo();
-                Grid.Box.setSelectedBoxMainText(e.getText());
+                if(e.getCode().getName().equals("W") || e.getCode().getName().equals("A") || e.getCode().getName().equals("S") || e.getCode().getName().equals("D")) {
 
-                if (!(Grid.Box.CheckForErrors()) && Grid.Box.CheckAllBoxesFilled()) {
+                    Grid.Box.setSelectedBoxFromKeyboard(e.getCode().getName());
 
-                    Grid.Box.playWinAnimation();
+                }else {
 
+                    Grid.Box.PushUndo();
+                    Grid.Box.setSelectedBoxMainText(e.getText());
+
+                    if (!(Grid.Box.CheckForErrors()) && Grid.Box.CheckAllBoxesFilled()) {
+
+                        Grid.Box.playWinAnimation();
+
+                    }
                 }
             });
+
 
             //Detect window resize and adjust text positions accordingly
             scene.widthProperty().addListener(e -> Grid.Box.updateAllBoxTextPositions());

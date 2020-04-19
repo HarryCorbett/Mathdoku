@@ -7,6 +7,7 @@ import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
+
 import javax.swing.*;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
@@ -27,7 +28,7 @@ class Grid {
     private static Stack<StackObject> undo = new Stack<>();
     private static Stack<StackObject> redo = new Stack<>();
 
-    static ArrayList<Box> getAllBoxes(){
+    static ArrayList<Box> getAllBoxes() {
         return allBoxes;
     }
 
@@ -103,7 +104,7 @@ class Grid {
             mainText.setTranslateX(this.getWidth() / 2 + 20);
             this.getChildren().add(mainText);
 
-            this.setMinSize(40,40);
+            this.setMinSize(40, 40);
 
             // On mouse click select the given box, deselect the previous box
             setOnMouseClicked(e -> {
@@ -117,8 +118,14 @@ class Grid {
 
         }
 
+        static void setFirstSelectedBox(){
+            selectedBox.previousStyle = selectedBox.getStyle();
+            selectedBox.setStyle("-fx-background-color: Gainsboro;");
+        }
+
         /**
          * Set the main text for a given box
+         *
          * @param mainText text to set variable to
          */
         void setMainText(String mainText) {
@@ -126,7 +133,7 @@ class Grid {
         }
 
         /**
-         * Get ID of box
+         * Get ID of a box
          *
          * @return ID
          */
@@ -135,7 +142,7 @@ class Grid {
         }
 
         /**
-         * Set the text in a box
+         * Set the text in the top corner of a box
          *
          * @param string to set as the top left text
          */
@@ -161,6 +168,45 @@ class Grid {
                 selectedBox.mainText.setText(text);
                 selectedBox.mainText.setTranslateX(selectedBox.getWidth() / 2 - 5);
                 selectedBox.mainText.setTranslateY(selectedBox.getHeight() / 2 + 10);
+            }
+        }
+
+        static void setSelectedBoxFromKeyboard(String code) {
+
+            int n = Mathdoku.getN();
+
+            switch (code) {
+                case "W":
+                    if(selectedBox.getID() > n) {
+                        selectedBox.setStyle("-fx-background-color: transparent;");
+                        selectedBox = getBox(selectedBox.getID() - n);
+                        selectedBox.previousStyle = selectedBox.getStyle();
+                        selectedBox.setStyle("-fx-background-color: Gainsboro;");
+                    }
+                    break;
+                case "A":
+                    if(!(selectedBox.getID() % Mathdoku.getN() == 1)) {
+                        selectedBox.setStyle("-fx-background-color: transparent;");
+                        selectedBox = getBox(selectedBox.getID() - 1);
+                        selectedBox.previousStyle = selectedBox.getStyle();
+                        selectedBox.setStyle("-fx-background-color: Gainsboro;");
+                    }
+                    break;
+                case "S":
+                    if(selectedBox.getID() + n < n * n + 1){
+                        selectedBox.setStyle("-fx-background-color: transparent;");
+                        selectedBox = getBox(selectedBox.getID() + n);
+                        selectedBox.previousStyle = selectedBox.getStyle();
+                        selectedBox.setStyle("-fx-background-color: Gainsboro;");
+                    }
+                    break;
+                case "D":
+                    if(!(selectedBox.getID() % n == 0)) {
+                        selectedBox.setStyle("-fx-background-color: transparent;");
+                        selectedBox = getBox(selectedBox.getID() + 1);
+                        selectedBox.previousStyle = selectedBox.getStyle();
+                        selectedBox.setStyle("-fx-background-color: Gainsboro;");
+                    }
             }
         }
 
@@ -380,6 +426,7 @@ class Grid {
 
         /**
          * Check that all boxes are filled in order to detect when the grid is correct
+         *
          * @return true if all are filled
          */
         static boolean CheckAllBoxesFilled() {
@@ -397,7 +444,7 @@ class Grid {
         /**
          * Push the contents of a box to the stack before it changes so it can be reverted to
          */
-        static void PushUndo(){
+        static void PushUndo() {
 
             StackObject stackObject = new StackObject(selectedBox, selectedBox.getMainText().getText());
             undo.push(stackObject);
@@ -408,22 +455,22 @@ class Grid {
         /**
          * Pop a value from the undo stack, push that value to the redo stack
          */
-        static void PopUndo(){
+        static void PopUndo() {
 
-            if(!undo.empty()) {
+            if (!undo.empty()) {
 
-               StackObject stackObject = undo.pop();
+                StackObject stackObject = undo.pop();
 
-                StackObject redoStackObject = new StackObject(stackObject.getBox(),stackObject.getBox().getMainText().getText());
+                StackObject redoStackObject = new StackObject(stackObject.getBox(), stackObject.getBox().getMainText().getText());
                 redo.push(redoStackObject);
 
-               stackObject.getBox().getMainText().setText(stackObject.getText());
+                stackObject.getBox().getMainText().setText(stackObject.getText());
 
                 TopUI.SetRedo(false);
 
             }
 
-            if(undo.empty()){
+            if (undo.empty()) {
                 TopUI.SetUndo(true);
             }
         }
@@ -431,13 +478,13 @@ class Grid {
         /**
          * Pop from the redo stack, push that value to the undo stack
          */
-        static void PopRedo(){
+        static void PopRedo() {
 
-            if(!redo.empty()) {
+            if (!redo.empty()) {
 
                 StackObject stackObject = redo.pop();
 
-                StackObject undoStackObject = new StackObject(stackObject.getBox(),stackObject.getBox().getMainText().getText());
+                StackObject undoStackObject = new StackObject(stackObject.getBox(), stackObject.getBox().getMainText().getText());
                 undo.push(undoStackObject);
 
                 stackObject.getBox().getMainText().setText(stackObject.getText());
@@ -446,7 +493,7 @@ class Grid {
 
             }
 
-            if(redo.empty()){
+            if (redo.empty()) {
                 TopUI.SetRedo(true);
             }
         }
@@ -454,34 +501,39 @@ class Grid {
         /**
          * clear both stacks
          */
-        static void ClearStacks(){
+        static void ClearStacks() {
 
             undo.clear();
             redo.clear();
 
         }
 
-        static void updateFontSizes(String fontSize){
+        /**
+         * Uppdate the size of all text in the boxes according to the size selected
+         *
+         * @param fontSize small, medium or large (selected in choice box)
+         */
+        static void updateFontSizes(String fontSize) {
 
-            for(Box box:allBoxes){
+            for (Box box : allBoxes) {
 
                 switch (fontSize) {
                     case "Small":
                         box.getMainText().setFont(new Font(10));
-                        box.getMainText().setX(box.getPrefWidth()/2 + 1);
+                        box.getMainText().setX(box.getPrefWidth() / 2 + 1);
                         box.cageText.setFont(new Font(8));
                         box.cageText.setY(11);
                         break;
                     case "Medium":
                         box.getMainText().setFont(new Font(15));
-                        box.getMainText().setX(box.getPrefWidth()/2);
+                        box.getMainText().setX(box.getPrefWidth() / 2);
                         box.cageText.setFont(new Font(10));
                         box.cageText.setY(15);
 
                         break;
                     case "Large":
                         box.getMainText().setFont(new Font(25));
-                        box.getMainText().setX(box.getPrefWidth()/2 - 2);
+                        box.getMainText().setX(box.getPrefWidth() / 2 - 2);
                         box.cageText.setFont(new Font(15));
                         box.cageText.setY(17);
                         break;
@@ -489,21 +541,30 @@ class Grid {
             }
         }
 
+        /**
+         * Play the animation when the grid is correctly filled in
+         */
         static void playWinAnimation() {
 
             ArrayList<Box> Boxes = new ArrayList<>(getAllBoxes());
 
-            final Timer t = new Timer(125,null);
-            t.addActionListener(new ActionListener(){
+            final Timer t = new Timer(125, null);
+            t.addActionListener(new ActionListener() {
 
-                int i=0;
+                int i = 0;
+
                 @Override
                 public void actionPerformed(java.awt.event.ActionEvent actionEvent) {
 
                     Boxes.get(i).setStyle("-fx-background-color: rgba(0,154,0,0.70);");
                     Boxes.get(i).previousStyle = "-fx-background-color: rgba(0,154,0,0.70);";
 
-                    if(i == Boxes.size()-1){
+                    if (i + 1 < Boxes.size()) {
+                        Boxes.get(i + 1).setStyle("-fx-background-color: rgba(255,123,0,0.7);");
+                        Boxes.get(i + 1).previousStyle = "-fx-background-color: rgba(255,123,0,0.7);";
+                    }
+
+                    if (i == Boxes.size() - 1) {
 
                         Platform.runLater(() -> {
 
@@ -520,7 +581,9 @@ class Grid {
 
                     }
 
-                    if(i>Boxes.size()-2){t.stop();}
+                    if (i > Boxes.size() - 2) {
+                        t.stop();
+                    }
                     i++;
                 }
 
