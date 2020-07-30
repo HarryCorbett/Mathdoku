@@ -519,15 +519,15 @@ class Grid {
 
                 switch (fontSize) {
                     case "Small":
-                        box.getMainText().setFont(new Font(10));
+                        box.getMainText().setFont(new Font(15));
                         box.getMainText().setX(box.getPrefWidth() / 2 + 1);
                         box.cageText.setFont(new Font(8));
                         box.cageText.setY(11);
                         break;
                     case "Medium":
-                        box.getMainText().setFont(new Font(15));
+                        box.getMainText().setFont(new Font(20));
                         box.getMainText().setX(box.getPrefWidth() / 2);
-                        box.cageText.setFont(new Font(10));
+                        box.cageText.setFont(new Font(12));
                         box.cageText.setY(15);
 
                         break;

@@ -41,8 +41,12 @@ class TopUI extends Node {
         undo = new Button("Undo");
         redo = new Button("Redo");
         Button clear = new Button("Clear");
+
         Button loadFromFile = new Button("load From File");
         Button loadFromText = new Button("load From Text");
+        loadFromFile.setDisable(true);
+        loadFromText.setDisable(true);
+
         final CheckBox[] showErrorsCheckbox = {new CheckBox("Show errors")};
         Button randomGame = new Button("Generate random game");
 
@@ -123,6 +127,7 @@ class TopUI extends Node {
                         if (line.contains(" ")) {
                             resultAndBoxes = line.split(" ");
                         } else {
+
                             errorDetected = true;
                             break;
                         }
@@ -359,6 +364,7 @@ class TopUI extends Node {
                 usedBoxes.add(stringBox);
 
             } else {
+
                 errorDetected = true;
                 break;
             }
@@ -525,7 +531,7 @@ class TopUI extends Node {
             if (!(usedBoxesForCage.contains(box.getID()))) {
 
                 ArrayList<Integer> currentCageArray = new ArrayList<>();
-                int cageSize = random.nextInt(difficulty);
+                int cageSize = random.nextInt(difficulty - 1) + 1;
 
                 usedBoxesForCage.add(box.getID());
                 currentCageArray.add(box.getID());
@@ -656,20 +662,15 @@ class TopUI extends Node {
 
         Grid.Box.clearAllBoxes();
 
-        // Make the array look nice for testing <---------------------------------- delete this later
-        for (int j = 0; j < grid.length; j++) {
-
-            grid[j][N] = 0;
-            grid[N][j] = 0;
-
-        }
-
-        System.out.println();
-        for (int[] i : grid) {
-            System.out.println(Arrays.toString(i));
-        }
-
-        // --------------------------------------------------------------------------
+        //Display solution to random puzzle (un-comment to output solution in command line)
+//        for (int j = 0; j < grid.length; j++) {
+//            grid[j][N] = 0;
+//            grid[N][j] = 0;
+//        }
+//        System.out.println();
+//        for (int[] i : grid) {
+//            System.out.println(Arrays.toString(i));
+//        }
 
     }
 
